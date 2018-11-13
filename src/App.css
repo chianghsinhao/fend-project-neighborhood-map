@@ -35,22 +35,51 @@ html, body, #root, .App {
   }
 }
 
+#root {
+  z-index: 0;
+}
+
 /* The side navigation menu */
 nav {
   height: 100%; /* 100% Full-height */
   width: 400px; /* 0 width - change this with JavaScript */
   max-width: 400px;
+  min-width: 350px;
   position: fixed; /* Stay in place */
-  z-index: 1; /* Stay on top */
+  z-index: 2; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 0;
   background-color: #EEE8AA;
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s;
+}
+
+nav .menu-icon {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 36px;
+  margin-left: 50px;
+  visibility: hidden;
+  text-decoration: none;
+}
+
+.nav-oepn {
+  left: 0
+}
+
+.nav-close {
+  left: -350px
 }
 
 nav h1 {
   margin-left: 40px;
+}
+
+nav p {
+  margin-left: 40px;
+  max-width: 300px;
 }
 
 .input-filter {
@@ -62,8 +91,29 @@ nav h1 {
 }
 
 .map {
-  position: absolute;
   top: 0;
-  left: 430px;
+  left: 400px;
   width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+@media (max-width: 850px) {
+  nav {
+    max-width: 100%;
+  }
+
+  nav .menu-icon {
+    visibility: visible;
+  }
+
+  .map {
+    left: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-close {
+    left: -300px
+  }
 }
