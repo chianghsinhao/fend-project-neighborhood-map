@@ -156,13 +156,15 @@ export class MapContainer extends Component {
       showingLocations = locations
     }
 
-    /* Extends bounds for displaying restaurants */
     let bounds = new this.props.google.maps.LatLngBounds();
-    for (let i = 0; i < showingLocations.length; i++) {
-      bounds.extend({
-        lat: showingLocations[i].location.lat,
-        lng: showingLocations[i].location.lng
-      })
+    /* Extends bounds for displaying restaurants */
+    if (showingLocations) {
+      for (let i = 0; i < showingLocations.length; i++) {
+        bounds.extend({
+          lat: showingLocations[i].location.lat,
+          lng: showingLocations[i].location.lng
+        })
+      }
     }
 
     return (
@@ -213,7 +215,7 @@ export class MapContainer extends Component {
           bounds={bounds}
           mapTypeControl={false}
           resetBoundsOnResize={true}>
-           {showingLocations.map((x, idx) => (
+           {showingLocations && showingLocations.length? showingLocations.map((x, idx) => (
              <Marker
                onClick={this.onMarkerClick}
                key={x.id}
@@ -227,8 +229,7 @@ export class MapContainer extends Component {
                           this.props.google.maps.Animation.BOUNCE:
                           null}>
              </Marker>
-           ))}
-
+           )):''}
           <InfoWindow
             marker={this.state.activeMarker}
             visible={this.state.showingInfoWindow}

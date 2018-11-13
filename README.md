@@ -1,44 +1,27 @@
+
+This is the Udacitiy Frontend Nanodegree Project 7. A neighborhood map of poke restaurants are listed.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Instruction to run the test
+Run `npm install`
+Run `npm start`
+Optionally you can replace the Google map and Foursquare API key
 
-In the project directory, you can run:
+## Libraries
+* [google-maps-react](https://github.com/fullstackreact/google-maps-react)
+* [escape-string-regexp](https://www.npmjs.com/package/escape-string-regexp)
+* [Google Map API](https://developers.google.com/maps/documentation/javascript/tutorial)
+* [Foursquare API](https://developer.foursquare.com/docs)
 
-### `npm start`
+# References
+* [goole-maps-react tutorial](https://scotch.io/tutorials/react-apps-with-the-google-maps-api-and-google-maps-react)
+* [Animated side nav menu](https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_sidenav)
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Additional notes
+* Foursquare API is used to fetch the restaurant list and location information.
+* To resize map without making additional request, `resetBoundsOnResize` is passed to Map component.
+* To make list clickable, an array of refs is setup to link with each marker.
+* Responsiveness layout is designed so that the nav sidebar can be hidden on smaller screen.
+* Text input can filter both the list items and markers on map.
+* In the case of foursquare API error, an error message will display on sidebar
