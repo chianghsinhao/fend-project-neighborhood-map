@@ -29,18 +29,24 @@ export class MapContainer extends Component {
     activeMarker: {},
     selectedPlace: {},
     locations: [],
-    query: ''
+    query: '',
+    markerRefs: []
   }
 
-  /* List click event */
-  onListClick(name) {
-    // todo
+  /* List click event; use a list of refs to access the
+     marker object  */
+  onListClick(name, idx) {
+    let selectedPlace = this.state.locations[idx]
+    this.setState({
+      selectedPlace: selectedPlace,
+      activeMarker: this.state.markerRefs[idx].current.marker,
+      showingInfoWindow: true
+    })
   }
 
   /* Marker click event: set selected place, active marker and display infoWindow  */
   onMarkerClick = (props, marker, e) => {
     let selectedPlace = this.state.locations.filter(x => x.name === props.name)[0];
-
     this.setState({
       selectedPlace: selectedPlace,
       activeMarker: marker,
@@ -69,8 +75,6 @@ export class MapContainer extends Component {
       var w = window.innerWidth
               || document.documentElement.clientWidth
               || document.body.clientWidth;
-      console.log(w)
-      console.log(vm.state)
       if (w < 850) {
         if (!vm.state.largeMedia) return
         vm.setState({ largeMedia: false })
@@ -94,16 +98,26 @@ export class MapContainer extends Component {
       })
       .then((data) => {
         this.setState({locations: data.response.venues})
+
+        let refs = []
+        /* Create marker for each entry */
+        for (let i = 0; i < data.response.venues.length; i++) {
+          let ref = React.createRef()
+          refs.push(ref)
+        }
+        this.setState({ markerRefs: refs})
+        this.resizeMap()
       })
       .catch((err) => {
         console.log('error in fetch', err)
+        this.resizeMap()
+        this.openNav()
       })
 
     let vm = this
     window.addEventListener('resize', function() {
       vm.resizeMap()
     })
-    this.resizeMap()
   }
 
   openNav() {
@@ -117,14 +131,11 @@ export class MapContainer extends Component {
   }
 
   toggleNav() {
-    console.log(this.state.showingSidebar)
     if (this.state.showingSidebar) {
-      console.log('close nav')
       this.closeNav()
       this.setState({ showingSidebar: false })
     }
     else {
-      console.log('open nav')
       this.openNav()
       this.setState({ showingSidebar: true })
     }
@@ -163,7 +174,7 @@ export class MapContainer extends Component {
             onClick={() => {this.toggleNav()}}>
             &#9776;
           </a>
-        <h1>Poke Map</h1>
+        <h1>San Jose Poke Map</h1>
         <p>
           Click the restaurant from the list or use text to filter:
         </p>
@@ -175,16 +186,18 @@ export class MapContainer extends Component {
           placeholder="Filter with restaurant name or address"
           onChange={(event) => { this.updateQuery(event.target.value)} }/>
         <ul className="restaurant-list">{
-          showingLocations.map((x) => (
+          (showingLocations && showingLocations.length > 0) ?
+          showingLocations.map((x,idx) => (
             <li
               key={x.id}
               onClick={(e) => {
-                this.onListClick(e.target.value)
+                this.onListClick(e.target.value, idx)
               }}
             >
               {x.name}
             </li>
-          ))
+          )):
+          (<li key="0">Error fetching data from foursquare API!</li>)
         }</ul>
         </nav>
         <Map
@@ -200,14 +213,22 @@ export class MapContainer extends Component {
           bounds={bounds}
           mapTypeControl={false}
           resetBoundsOnResize={true}>
-          {showingLocations.map(x => (
-            <Marker
-              onClick={this.onMarkerClick}
-              key={x.id}
-              name={x.name}
-              position={{ lat: x.location.lat, lng: x.location.lng }}
-            />
-          ))}
+           {showingLocations.map((x, idx) => (
+             <Marker
+               onClick={this.onMarkerClick}
+               key={x.id}
+               name={x.name}
+               ref={this.state.markerRefs[idx]}
+               position={{ lat: x.location.lat, lng: x.location.lng }}
+               animation={/* If marker is active, make it bounce */
+                          this.state.markerRefs[idx] &&
+                          this.state.markerRefs[idx].current &&
+                          this.state.markerRefs[idx].current.marker === this.state.activeMarker?
+                          this.props.google.maps.Animation.BOUNCE:
+                          null}>
+             </Marker>
+           ))}
+
           <InfoWindow
             marker={this.state.activeMarker}
             visible={this.state.showingInfoWindow}
