@@ -5,12 +5,15 @@ import logo from './logo.svg';
 import './App.css';
 
 const mapStyles = {
-  width: '100%',
+  position: 'absolute',
+  left: '0',
+  width: 'calc(100% - 400px)',
   height: '100%'
 };
 
 export class MapContainer extends Component {
   state = {
+
     showingInfoWindow: false,
     activeMarker: {},
     selectedPlace: {},
@@ -83,9 +86,12 @@ export class MapContainer extends Component {
 
     return (
       <div>
+        <nav>
         <h1>Poke Map</h1>
         <input
+          className="input-filter"
           type="text"
+          size="40"
           value={this.state.query}
           placeholder="Filter with restaurant name or address"
           onChange={(event) => { this.updateQuery(event.target.value)} }
@@ -95,6 +101,7 @@ export class MapContainer extends Component {
             <li key={x.id}>{x.name}</li>
           ))
         }</ul>
+        </nav>
         <Map
           className="map"
           google={this.props.google}
