@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from 'google-maps-react';
+import escapeRegExp from 'escape-string-regexp'
 import logo from './logo.svg';
 import './App.css';
 
@@ -13,45 +14,22 @@ export class MapContainer extends Component {
     showingInfoWindow: false,
     activeMarker: {},
     selectedPlace: {},
-
-    locations: [
-      {
-        name: 'Poke Bar',
-        id: 'poke-bar-san-jose',
-        position: { lat: 37.321980, lng: -121.948150 },
-        address: '3055 Olin Ave, Ste 1045, San Jose, CA 95128'
-      } , {
-        name: 'Poke House',
-        id: 'poke-house-san-jose-6',
-        position: { lat: 37.361040, lng: -121.946928 },
-        address: '1308 S Winchester Blvd, San Jose, CA 95128'
-      } , {
-        name: 'Poke Paradise',
-        id: 'poke-paradise-san-jose-2',
-        position: { lat: 37.319320, lng: -121.974340 },
-        address: '455 Saratoga Ave, San Jose, CA 95129'
-      } , {
-        name: 'Ono Poke Bowl',
-        id: 'ono-poke-bowl-santa-clara-2',
-        position: { lat: 37.344540, lng: -121.933230 },
-        address: '2251 The Alameda, Santa Clara, CA 95050'
-      } , {
-        name: 'Poke Poke Fish Bar',
-        id: 'poke-poke-fish-bar-santa-clara',
-        position: { lat: 37.351910, lng: -121.967499 },
-        address: '2362 El Camino Real, Santa Clara, CA 95050'
-      }
-    ]
+    locations: [],
+    query: ''
   }
 
+  /* Marker click event: set selected place, active marker and display infoWindow  */
   onMarkerClick = (props, marker, e) => {
+    let selectedPlace = this.state.locations.filter(x => x.name === props.name)[0];
+
     this.setState({
-      selectedPlace: props,
+      selectedPlace: selectedPlace,
       activeMarker: marker,
       showingInfoWindow: true
     })
   };
 
+  /* Map click event: hide infoWindow if it's opened */
   onMapClicked = (props) => {
     if (this.state.showingInfoWindow) {
       this.setState({
@@ -61,16 +39,62 @@ export class MapContainer extends Component {
     }
   };
 
+  updateQuery(query) {
+    this.setState({query})
+  }
+
+  componentDidMount() {
+    /* Fetch from foursqure db */
+    fetch('https://api.foursquare.com/v2/venues/search?query=poke&near=san_jose_california&client_id=DVUPBKUDATRBTG2Z3YDFZFSO3D3N5P1DNRIM1URYA141DTEC&client_secret=SEFHXJ4ZFLZBLIGDBQ2AL4TR1K3QOZNI1XTK1HW35RLSLGGM&v=20181113')
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        this.setState({locations: data.response.venues})
+      })
+      .catch((err) => {
+        console.log('error in fetch', err)
+      })
+  }
+
   render() {
+    let {locations, selectedPlace, query} = this.state;
+
+    /* Narrow list if query is used */
+    let showingLocations;
+    if (query) {
+      const match = new RegExp(escapeRegExp(query), 'i')
+      showingLocations = locations.filter((loc) =>
+        match.test(loc.name) || match.test(loc.location.formattedAddress)
+      )
+    }
+    else {
+      showingLocations = locations
+    }
+
+    /* Extends bounds for displaying restaurants */
+    let bounds = new this.props.google.maps.LatLngBounds();
+    for (let i = 0; i < showingLocations.length; i++) {
+      bounds.extend({
+        lat: showingLocations[i].location.lat,
+        lng: showingLocations[i].location.lng
+      })
+    }
+
     return (
       <div>
-        <div>Poke Map</div>
+        <h1>Poke Map</h1>
         <input
           type="text"
           value={this.state.query}
-          placeholder="Filter with address or City"
+          placeholder="Filter with restaurant name or address"
+          onChange={(event) => { this.updateQuery(event.target.value)} }
         />
-
+        <ul className="restaurant-list">{
+          showingLocations.map((x) => (
+            <li key={x.id}>{x.name}</li>
+          ))
+        }</ul>
         <Map
           className="map"
           google={this.props.google}
@@ -81,13 +105,14 @@ export class MapContainer extends Component {
            lng: -121.952371
           }}
           onClick={this.onMapClicked}
+          bounds={bounds}
         >
-          {this.state.locations.map(x => (
+          {showingLocations.map(x => (
             <Marker
               onClick={this.onMarkerClick}
               key={x.id}
               name={x.name}
-              position={x.position}
+              position={{ lat: x.location.lat, lng: x.location.lng }}
             />
           ))}
           <InfoWindow
@@ -95,10 +120,11 @@ export class MapContainer extends Component {
             visible={this.state.showingInfoWindow}
             onClose={this.onInfoWindowClose}
           >
-            <div>
-              <h2>{this.state.selectedPlace.name}</h2>
-              <p>{this.state.selectedPlace.address}</p>
-              <p>{this.state.selectedPlace.id}</p>
+            <div className="info-detail">
+              <h2>{selectedPlace.name}</h2>
+              <p>{(selectedPlace.location && selectedPlace.location.formattedAddress)?
+                  selectedPlace.location.formattedAddress.join(', '):
+                  'Address unknown'}</p>
             </div>
           </InfoWindow>
         </Map>
