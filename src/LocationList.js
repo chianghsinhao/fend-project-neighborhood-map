@@ -14,7 +14,7 @@ function LocationList(props) {
               locationIdx={idx}
             />
         )) : (
-          <li key="0">Error fetching data from foursquare API!</li>
+          <li key="0">No data to display...</li>
         )
       }</ul>
     </div>
