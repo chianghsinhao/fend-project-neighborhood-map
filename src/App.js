@@ -30,7 +30,8 @@ export class MapContainer extends Component {
     selectedPlace: {},
     locations: [],
     query: '',
-    markerRefs: []
+    markerRefs: [],
+    navClassList: []
   }
 
   /* List click event; use a list of refs to access the
@@ -91,6 +92,11 @@ export class MapContainer extends Component {
   }
 
   componentDidMount() {
+    window.gm_authFailure = () => {
+      // Tell the user that something went wrong
+      alert('Error in Google Maps API!')
+    };
+
     /* Fetch from foursqure db */
     fetch('https://api.foursquare.com/v2/venues/search?query=poke&near=san_jose_california&client_id=DVUPBKUDATRBTG2Z3YDFZFSO3D3N5P1DNRIM1URYA141DTEC&client_secret=SEFHXJ4ZFLZBLIGDBQ2AL4TR1K3QOZNI1XTK1HW35RLSLGGM&v=20181113')
       .then((response) => {
@@ -110,6 +116,7 @@ export class MapContainer extends Component {
       })
       .catch((err) => {
         console.log('error in fetch', err)
+        alert('error in Foursquare API fetch!', err)
         this.resizeMap()
         this.openNav()
       })
@@ -121,13 +128,13 @@ export class MapContainer extends Component {
   }
 
   openNav() {
-    document.getElementsByTagName('nav')[0].classList.remove('nav-close')
-    document.getElementsByTagName('nav')[0].classList.add('nav-open')
+    let newNavClassList = ['nav-open']
+    this.setState({navClassList: newNavClassList})
   }
 
   closeNav() {
-    document.getElementsByTagName('nav')[0].classList.remove('nav-open')
-    document.getElementsByTagName('nav')[0].classList.add('nav-close')
+    let newNavClassList = ['nav-close']
+    this.setState({navClassList: newNavClassList})
   }
 
   toggleNav() {
@@ -169,11 +176,13 @@ export class MapContainer extends Component {
 
     return (
       <div>
-        <nav>
+        <nav
+          className={this.state.navClassList.join(' ')}>
           <a
             href="javascript:void(0)"
             className="menu-icon"
-            onClick={() => {this.toggleNav()}}>
+            onClick={() => {this.toggleNav()}}
+            aria-label="Menu Icon">
             &#9776;
           </a>
         <h1>San Jose Poke Map</h1>
@@ -186,7 +195,8 @@ export class MapContainer extends Component {
           size="40"
           value={this.state.query}
           placeholder="Filter with restaurant name or address"
-          onChange={(event) => { this.updateQuery(event.target.value)} }/>
+          onChange={(event) => { this.updateQuery(event.target.value)} }
+          arial-label="Restaurant filter"/>
         <ul className="restaurant-list">{
           (showingLocations && showingLocations.length > 0) ?
           showingLocations.map((x,idx) => (
@@ -194,6 +204,13 @@ export class MapContainer extends Component {
               key={x.id}
               onClick={(e) => {
                 this.onListClick(e.target.value, idx)
+              }}
+              role="Button"
+              tabIndex="0"
+              onKeyDown={(e) => {
+                if (e.keyCode === 13) {
+                  this.onListClick(e.target.value, idx)
+                }
               }}
             >
               {x.name}
@@ -214,7 +231,9 @@ export class MapContainer extends Component {
           onClick={this.onMapClicked}
           bounds={bounds}
           mapTypeControl={false}
-          resetBoundsOnResize={true}>
+          resetBoundsOnResize={true}
+          role="application"
+          aira-label="Restaurant map application  ">
            {showingLocations && showingLocations.length? showingLocations.map((x, idx) => (
              <Marker
                onClick={this.onMarkerClick}
