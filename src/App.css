@@ -98,6 +98,19 @@ nav p {
   z-index: 1;
 }
 
+.offline-canvas {
+  width: 100%;
+  height: 100%;
+  background-color: #F0FFFF;
+}
+
+.offline-notice {
+  width: 100%;
+  text-align: center;
+  color: #FFFFFF;
+  background-color: #FF0000;
+}
+
 @media (max-width: 850px) {
   nav {
     max-width: 100%;

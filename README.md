@@ -8,6 +8,12 @@ Run `npm install`
 Run `npm start`
 Optionally you can replace the Google map and Foursquare API key
 
+## Instruction to run the rest in production mode
+Run `npm run build`
+Run `npm install -g serve`
+Run `serve -s build`
+With this you should be able to test offline performance on _http://locahost:5000_
+
 ## Libraries
 * [google-maps-react](https://github.com/fullstackreact/google-maps-react)
 * [escape-string-regexp](https://www.npmjs.com/package/escape-string-regexp)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from 'google-maps-react';
 import escapeRegExp from 'escape-string-regexp'
+import { Offline, Online } from 'react-detect-offline'
 import logo from './logo.svg';
 import './App.css';
 
@@ -176,91 +177,99 @@ export class MapContainer extends Component {
 
     return (
       <div>
-        <nav
-          className={this.state.navClassList.join(' ')}>
-          <a
-            href="javascript:void(0)"
-            className="menu-icon"
-            onClick={() => {this.toggleNav()}}
-            aria-label="Menu Icon">
-            &#9776;
-          </a>
-        <h1>San Jose Poke Map</h1>
-        <p>
-          Click the restaurant from the list or use text to filter:
-        </p>
-        <input
-          className="input-filter"
-          type="text"
-          size="40"
-          value={this.state.query}
-          placeholder="Filter with restaurant name or address"
-          onChange={(event) => { this.updateQuery(event.target.value)} }
-          arial-label="Restaurant filter"/>
-        <ul className="restaurant-list">{
-          (showingLocations && showingLocations.length > 0) ?
-          showingLocations.map((x,idx) => (
-            <li
-              key={x.id}
-              onClick={(e) => {
-                this.onListClick(e.target.value, idx)
-              }}
-              role="Button"
-              tabIndex="0"
-              onKeyDown={(e) => {
-                if (e.keyCode === 13) {
+        <Online>
+          <nav
+            className={this.state.navClassList.join(' ')}>
+            <a
+              href="javascript:void(0)"
+              className="menu-icon"
+              onClick={() => {this.toggleNav()}}
+              aria-label="Menu Icon">
+              &#9776;
+            </a>
+          <h1>San Jose Poke Map</h1>
+          <p>
+            Data provided by <em>Foursquare API</em>
+          </p>
+          <p>
+            Click the restaurant from the list or use text to filter:
+          </p>
+          <input
+            className="input-filter"
+            type="text"
+            size="40"
+            value={this.state.query}
+            placeholder="Filter with restaurant name or address"
+            onChange={(event) => { this.updateQuery(event.target.value)} }
+            arial-label="Restaurant filter"/>
+          <ul className="restaurant-list">{
+            (showingLocations && showingLocations.length > 0) ?
+            showingLocations.map((x,idx) => (
+              <li
+                key={x.id}
+                onClick={(e) => {
                   this.onListClick(e.target.value, idx)
-                }
-              }}
-            >
-              {x.name}
-            </li>
-          )):
-          (<li key="0">Error fetching data from foursquare API!</li>)
-        }</ul>
-        </nav>
-        <Map
-          className="map"
-          google={this.props.google}
-          zoom={13}
-          style={this.state.mapStyles}
-          initialCenter={{
-           lat: 37.334356,
-           lng: -121.952371
-          }}
-          onClick={this.onMapClicked}
-          bounds={bounds}
-          mapTypeControl={false}
-          resetBoundsOnResize={true}
-          role="application"
-          aira-label="Restaurant map application  ">
-           {showingLocations && showingLocations.length? showingLocations.map((x, idx) => (
-             <Marker
-               onClick={this.onMarkerClick}
-               key={x.id}
-               name={x.name}
-               ref={this.state.markerRefs[idx]}
-               position={{ lat: x.location.lat, lng: x.location.lng }}
-               animation={/* If marker is active, make it bounce */
-                          this.state.markerRefs[idx] &&
-                          this.state.markerRefs[idx].current &&
-                          this.state.markerRefs[idx].current.marker === this.state.activeMarker?
-                          this.props.google.maps.Animation.BOUNCE:
-                          null}>
-             </Marker>
-           )):''}
-          <InfoWindow
-            marker={this.state.activeMarker}
-            visible={this.state.showingInfoWindow}
-            onClose={this.onInfoWindowClose}>
-            <div className="info-detail">
-              <h2>{selectedPlace.name}</h2>
-              <p>{(selectedPlace.location && selectedPlace.location.formattedAddress)?
-                  selectedPlace.location.formattedAddress.join(', '):
-                  'Address unknown'}</p>
-            </div>
-          </InfoWindow>
-        </Map>
+                }}
+                role="Button"
+                tabIndex="0"
+                onKeyDown={(e) => {
+                  if (e.keyCode === 13) {
+                    this.onListClick(e.target.value, idx)
+                  }
+                }}
+              >
+                {x.name}
+              </li>
+            )):
+            (<li key="0">Error fetching data from foursquare API!</li>)
+          }</ul>
+          </nav>
+          <Map
+            className="map"
+            google={this.props.google}
+            zoom={13}
+            style={this.state.mapStyles}
+            initialCenter={{
+             lat: 37.334356,
+             lng: -121.952371
+            }}
+            onClick={this.onMapClicked}
+            bounds={bounds}
+            mapTypeControl={false}
+            resetBoundsOnResize={true}
+            role="application"
+            aira-label="Restaurant map application  ">
+             {showingLocations && showingLocations.length? showingLocations.map((x, idx) => (
+               <Marker
+                 onClick={this.onMarkerClick}
+                 key={x.id}
+                 name={x.name}
+                 ref={this.state.markerRefs[idx]}
+                 position={{ lat: x.location.lat, lng: x.location.lng }}
+                 animation={/* If marker is active, make it bounce */
+                            this.state.markerRefs[idx] &&
+                            this.state.markerRefs[idx].current &&
+                            this.state.markerRefs[idx].current.marker === this.state.activeMarker?
+                            this.props.google.maps.Animation.BOUNCE:
+                            null}>
+               </Marker>
+             )):''}
+            <InfoWindow
+              marker={this.state.activeMarker}
+              visible={this.state.showingInfoWindow}
+              onClose={this.onInfoWindowClose}>
+              <div className="info-detail">
+                <h2>{selectedPlace.name}</h2>
+                <p>{(selectedPlace.location && selectedPlace.location.formattedAddress)?
+                    selectedPlace.location.formattedAddress.join(', '):
+                    'Address unknown'}</p>
+              </div>
+            </InfoWindow>
+          </Map>
+        </Online>
+        <Offline>
+          <p className="offline-notice">No network connection!</p>
+        </Offline>
       </div>
     );
   }
