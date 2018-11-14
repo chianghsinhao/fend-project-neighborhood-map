@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from 'google-maps-react';
 import escapeRegExp from 'escape-string-regexp'
 import { Offline, Online } from 'react-detect-offline'
+import LocationList from './LocationList'
 import logo from './logo.svg';
 import './App.css';
 
@@ -44,6 +45,7 @@ export class MapContainer extends Component {
       activeMarker: this.state.markerRefs[idx].current.marker,
       showingInfoWindow: true
     })
+    this.closeNav()
   }
 
   /* Marker click event: set selected place, active marker and display infoWindow  */
@@ -129,23 +131,29 @@ export class MapContainer extends Component {
   }
 
   openNav() {
+    if (this.state.largeMedia) return
     let newNavClassList = ['nav-open']
-    this.setState({navClassList: newNavClassList})
+    this.setState({
+      navClassList: newNavClassList,
+      showingSidebar: true
+    })
   }
 
   closeNav() {
+    if (this.state.largeMedia) return
     let newNavClassList = ['nav-close']
-    this.setState({navClassList: newNavClassList})
+    this.setState({
+      navClassList: newNavClassList,
+      showingSidebar: false
+    })
   }
 
   toggleNav() {
     if (this.state.showingSidebar) {
       this.closeNav()
-      this.setState({ showingSidebar: false })
     }
     else {
       this.openNav()
-      this.setState({ showingSidebar: true })
     }
   }
 
@@ -202,27 +210,12 @@ export class MapContainer extends Component {
             placeholder="Filter with restaurant name or address"
             onChange={(event) => { this.updateQuery(event.target.value)} }
             arial-label="Restaurant filter"/>
-          <ul className="restaurant-list">{
-            (showingLocations && showingLocations.length > 0) ?
-            showingLocations.map((x,idx) => (
-              <li
-                key={x.id}
-                onClick={(e) => {
-                  this.onListClick(e.target.value, idx)
-                }}
-                role="Button"
-                tabIndex="0"
-                onKeyDown={(e) => {
-                  if (e.keyCode === 13) {
-                    this.onListClick(e.target.value, idx)
-                  }
-                }}
-              >
-                {x.name}
-              </li>
-            )):
-            (<li key="0">Error fetching data from foursquare API!</li>)
-          }</ul>
+          <LocationList
+            locations={showingLocations}
+            onClick={(name, idx) => {
+              this.onListClick(name, idx)
+            }}
+          />
           </nav>
           <Map
             className="map"
