@@ -131,7 +131,6 @@ export class MapContainer extends Component {
   }
 
   openNav() {
-    if (this.state.largeMedia) return
     let newNavClassList = ['nav-open']
     this.setState({
       navClassList: newNavClassList,
