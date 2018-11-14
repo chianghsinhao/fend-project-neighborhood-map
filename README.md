@@ -4,19 +4,20 @@ This is the Udacitiy Frontend Nanodegree Project 7. A neighborhood map of poke r
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Instruction to run the test
-Run `npm install`
-Run `npm start`
-Optionally you can replace the Google map and Foursquare API key
+1. Run `npm install`
+2. Run `npm start`
+3. Optionally you can replace the Google map and Foursquare API key
 
 ## Instruction to run the rest in production mode
-Run `npm run build`
-Run `npm install -g serve`
-Run `serve -s build`
-With this you should be able to test offline performance on _http://locahost:5000_
+1. Run `npm run build`
+2. Run `npm install -g serve`
+3. Run `serve -s build`
+4. With this you should be able to test offline performance on _http://locahost:5000_
 
 ## Libraries
 * [google-maps-react](https://github.com/fullstackreact/google-maps-react)
 * [escape-string-regexp](https://www.npmjs.com/package/escape-string-regexp)
+[react-detect-offline](https://www.npmjs.com/package/react-detect-offline)
 * [Google Map API](https://developers.google.com/maps/documentation/javascript/tutorial)
 * [Foursquare API](https://developer.foursquare.com/docs)
 
@@ -31,3 +32,10 @@ With this you should be able to test offline performance on _http://locahost:500
 * Responsiveness layout is designed so that the nav sidebar can be hidden on smaller screen.
 * Text input can filter both the list items and markers on map.
 * In the case of foursquare API error, an error message will display on sidebar
+---- After 1st project review ----
+* Aria label is added for customized inputs
+* Focus is managed to provide better accessibility experience
+* LocationList and LocationItem component is created
+* User is notified when Google API returns error
+* During offline a message is displayed
+* Using `setState()` instead of directly updating DOM elements
